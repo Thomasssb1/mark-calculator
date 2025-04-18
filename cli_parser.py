@@ -1,6 +1,6 @@
 import sys
 from arg import Arg
-from invalid_arg import InvalidArgumentException
+from exceptions.invalid_argument import InvalidArgumentException
 
 
 class CLIParser:
@@ -18,6 +18,8 @@ class CLIParser:
             raise InvalidArgumentException(
                 "Flag options should not have a default value", name
             )
+        if name in self.options:
+            raise InvalidArgumentException("Option name already exists", name)
         self.options[name] = Arg(name=name, value=default, flag=flag, hidden=hidden)
 
     def parse(self) -> None:
@@ -46,6 +48,6 @@ class CLIParser:
         for v in self.options.values():
             if v.hidden:
                 continue
-            name = f"-{v.name}" if v.flag else f"--{v.name}"
-            temp += f"{name} : {v.type}, default={v.value}\n"
+            name = f"--{v.name}" if v.flag else f"-{v.name}"
+            temp += f"{name}{f' : {v.type}' if not v.flag else ''}, default={v.value}\n"
         return temp
