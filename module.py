@@ -1,5 +1,6 @@
 from typing import Set
 from exceptions.invalid_file_format import InvalidFileFormatException
+import csv
 
 
 class Module:
@@ -11,13 +12,19 @@ class Module:
     @staticmethod
     def from_csv(filename: str) -> Set["Module"]:
         with open(filename, "r") as file:
-            lines = file.readlines()
+            reader = csv.reader(file)
+            next(reader)
             modules = set()
-            for line in lines[1:]:
+            for line in reader:
                 try:
-                    name, credits, grade = line.strip().split(",")
+                    name, credits, grade = line
+                    print(name, credits, grade)
                     modules.add(
-                        Module(name, int(credits), int(grade) if grade else None)
+                        Module(
+                            name,
+                            int(credits),
+                            int(grade) if grade != "Not graded" else None,
+                        )
                     )
                 except ValueError:
                     raise InvalidFileFormatException(
@@ -31,7 +38,7 @@ class Module:
             file.write("name,credits,grade\n")
             for module in modules:
                 file.write(
-                    f"{module.name},{module.credits},{module.grade if module.grade is not None else ''}\n"
+                    f"\"{module.name}\",{module.credits},{module.grade if module.grade is not None else 'Not graded'}\n"
                 )
         print(f"Saved modules to {filename}")
 

@@ -1,10 +1,10 @@
 from typing import Set
 from cli_parser import CLIParser
 from module import Module
+from module_calculator import ModuleCalculator
 
 if __name__ == "__main__":
     parser = CLIParser()
-    parser.add_option("total", required=True, value_type=int)
     parser.add_option("target", required=True, value_type=int)
     parser.add_option("load", flag=True, default=False)
 
@@ -42,4 +42,11 @@ if __name__ == "__main__":
                 print("Invalid input. Please enter a number.")
                 continue
 
-        Module.save_to_csv(modules, FILENAME)
+        if parser.was_parsed("load"):
+            Module.save_to_csv(modules, FILENAME)
+
+        calculator = ModuleCalculator(
+            modules,
+            target=parser.get_option("target"),
+        )
+        print(calculator)

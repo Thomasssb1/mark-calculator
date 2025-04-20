@@ -76,21 +76,21 @@ class CLIParser:
             isFlag = not arg.startswith("--")
             value = True if isFlag else arg.split("=")[1]
             arg = arg.replace("-", "").split("=")[0]
-            print(arg, value)
-            print(self.options[command].args[arg].type)
-            print(self._is_type(value, self.options[command].args[arg].type))
             if arg in self.options[command].args and self._is_type(
                 value, self.options[command].args[arg].type
             ):
-                print(f"Setting {arg} to {value}")
                 self.options[command].args[arg].value = value
 
         self.contains_required(self.options[command])
 
-    def get_option(self, name: str) -> any:
+    def get_option(self, name: str, command: str | None = None) -> any:
         """Get the value of an option."""
-        arg = self.options.get(name, None)
-        return arg.value if not arg is None else None
+        command: Command = self.options.get(command, None)
+        if command is None:
+            raise InvalidArgumentException("Command not found", command)
+
+        arg = command.get_arg(name)
+        return arg.value if arg is not None else None
 
     def set_command(self) -> str | None:
         """Get the command name."""
