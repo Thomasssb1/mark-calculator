@@ -8,11 +8,13 @@ from exceptions import InvalidArgumentException, RequiredArgumentException
 class CLIParser:
     def __init__(self):
         self.args = sys.argv[1:]
-        self.options = {None: Command(command="Default", hidden=False)}
+        self.options = {None: Command(command="Default", description="", hidden=False)}
         self.command = None
 
-    def add_command(self, name: str, hidden=False) -> None:
-        self.options[name] = Command(name, hidden)
+    def add_command(
+        self, name: str, hidden: bool = False, description: str | None = None
+    ) -> None:
+        self.options[name] = Command(name, description or "", hidden)
 
     def add_option(
         self,
@@ -55,9 +57,9 @@ class CLIParser:
         """Check if a command exists."""
         return name in self.options
 
-    def contains_required(self, command: Command) -> bool:
-        for option in command.args.values():
-            if option.required and not self.was_parsed(option.name):
+    def contains_required(self, command: str | None) -> bool:
+        for option in self.options[command].args.values():
+            if option.required and not self.was_parsed(option.name, command):
                 raise RequiredArgumentException(
                     f"Missing required argument: {option.name}"
                 )
@@ -81,7 +83,7 @@ class CLIParser:
             ):
                 self.options[command].args[arg].value = value
 
-        self.contains_required(self.options[command])
+        self.contains_required(command)
 
     def get_option(self, name: str, command: str | None = None) -> any:
         """Get the value of an option."""
@@ -118,8 +120,9 @@ class CLIParser:
         for v in self.options.values():
             if v.hidden:
                 continue
-            temp += f"Command: {v.command}\n"
+            temp += f"{v.command} {f'- {v.description}' if v.description else ''}\n"
             for a in v.args.values():
                 name = f"-{a.name}" if a.flag else f"--{a.name}"
                 temp += f"{name}{f' : {a.type}' if not a.flag else ''}, default={a.value}{', required' if a.required else ''}\n"
+            temp += "\n"
         return temp

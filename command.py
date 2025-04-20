@@ -2,8 +2,9 @@ from arg import Arg
 
 
 class Command:
-    def __init__(self, command: str, hidden: bool):
+    def __init__(self, command: str, description: str, hidden: bool):
         self.command = command
+        self.description = description
         self.hidden = hidden
         self.args = {}
 

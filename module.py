@@ -48,11 +48,7 @@ class Module:
     def __eq__(self, other):
         if not isinstance(other, Module):
             return False
-        return (
-            self.name == other.name
-            and self.credits == other.credits
-            and self.grade == other.grade
-        )
+        return self.name == other.name
 
     def __hash__(self):
-        return hash((self.name, self.credits, self.grade))
+        return hash((self.name))
