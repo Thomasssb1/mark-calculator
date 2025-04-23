@@ -1,4 +1,4 @@
-from any_type import AnyType
+from typing import Any
 
 
 class Arg:
@@ -9,7 +9,7 @@ class Arg:
         flag: bool,
         hidden: bool,
         required: bool,
-        type: type | AnyType,
+        type: type | Any,
     ):
         self.name = name
         self.value = value

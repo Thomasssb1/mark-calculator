@@ -1,11 +1,11 @@
-from typing import Set
+from typing import Set, List
 from cli_parser import CLIParser
 from module import Module
 from module_calculator import ModuleCalculator
 
 if __name__ == "__main__":
     parser = CLIParser()
-    parser.add_option("target", required=True, value_type=int)
+    parser.add_option("target", required=True, value_type=float)
     parser.add_option("load", flag=True, default=True)
 
     parser.add_command("help", hidden=True)
@@ -14,15 +14,27 @@ if __name__ == "__main__":
     parser.add_command("add", description="Add a module")
     parser.add_option("name", command="add", value_type=str, required=True)
     parser.add_option("credits", command="add", required=True, value_type=int)
-    parser.add_option("grade", command="add", value_type=int)
+    parser.add_option("grades", command="add", value_type=List[float])
+    parser.add_option("weights", command="add", value_type=List[float])
 
     parser.add_command("remove", description="Remove a module")
     parser.add_option("name", command="remove", value_type=str, required=True)
+
+    parser.add_command("list", description="List all modules")
 
     parser.parse()
 
     if parser.command == "help":
         print(parser)
+    elif parser.command == "list":
+        FILENAME = "data/scores.csv"
+        modules: Set[Module] = set()
+        modules = Module.from_csv(FILENAME)
+        for module in modules:
+            print(module)
+            if module.tests:
+                print(f"Grades: {', '.join(map(str, module.tests))}")
+            print("")
     else:
         FILENAME = "data/scores.csv"
         modules: Set[Module] = set()
@@ -38,13 +50,26 @@ if __name__ == "__main__":
                 print(f"Module '{inp}' already exists. Replacing it.")
             try:
                 credits = int(parser.get_option("credits", command="add"))
-                grade = None
+                grades = None
                 try:
-                    grade = int(parser.get_option("grade", command="add"))
+                    grades = CLIParser.convert_to_list(
+                        parser.get_option("grades", command="add"), List[float]
+                    )
+                    print(grades)
+
                 except TypeError:
                     print("No grade provided, setting to ungraded.")
 
-                modules.add(Module(inp, credits, grade))
+                weights = None
+                if grades is not None:
+                    try:
+                        weights = CLIParser.convert_to_list(
+                            parser.get_option("weights", command="add"), List[float]
+                        )
+                    except TypeError:
+                        print("No weight provided, setting to unweighted.")
+
+                modules.add(Module(inp, credits, grades, weights))
                 print(f"Added module: {inp}")
             except TypeError:
                 print("Invalid input for --credits. Please enter a number.")
@@ -66,4 +91,4 @@ if __name__ == "__main__":
                 modules,
                 target=parser.get_option("target"),
             )
-            print(calculator)
+            calculator.calculate()

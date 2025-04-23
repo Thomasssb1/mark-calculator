@@ -5,21 +5,30 @@ from module import Module
 class ModuleCalculator:
     def __init__(self, modules: Set[Module], target: int):
         self.modules = modules
-        self.achieved_credits = sum(
-            module.credits for module in modules if module.grade is not None
-        )
         self.total_credits = sum(module.credits for module in modules)
-        self.target_grade = int(target)
+        self.target_grade = float(target)
+
+    def _calculate_required_grade(self) -> float:
+        calculated_grade = 0.0
+        remaining_credits = self.total_credits
+        for module in self.modules:
+            if module.is_complete():
+                remaining_credits -= module.credits
+                calculated_grade += module.calculate_overall_grade() * (
+                    module.credits / self.total_credits
+                )
+
+        return (self.target_grade - calculated_grade) / (
+            remaining_credits / self.total_credits
+        )
 
     def calculate(self) -> float:
-        current_weighted_grades = sum(
-            module.credits * (module.grade if module.grade else 0)
-            for module in self.modules
-        )
-
-        return ((self.target_grade * self.total_credits) - current_weighted_grades) / (
-            self.total_credits - self.achieved_credits
-        )
+        grade = self._calculate_required_grade()
+        for module in self.modules:
+            if not module.is_complete():
+                print(
+                    f"Module {module.name} requires an average grade of {module.calculate_required_percentage(grade):.2f}%"
+                )
 
     def __str__(self):
         return (

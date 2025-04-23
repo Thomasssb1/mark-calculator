@@ -1,4 +1,5 @@
 import sys
+from typing import get_origin, get_args, Any, List
 from arg import Arg
 from command import Command
 from any_type import AnyType
@@ -24,7 +25,7 @@ class CLIParser:
         default=None,
         hidden=False,
         required=False,
-        value_type: type | AnyType = AnyType(),
+        value_type: type | Any = Any,
     ) -> None:
         """Add an option to the parser."""
         if name.startswith("-"):
@@ -65,8 +66,56 @@ class CLIParser:
                 )
         return True
 
-    def _is_type(self, value: any, value_type: type | AnyType) -> bool:
+    @staticmethod
+    def convert_to_list(value: str, value_type: type) -> List:
+        if get_origin(value_type) is list:
+            value_type = get_args(value_type)[0]
+            inner_type = get_args(value_type)
+            if isinstance(value, str):
+                items = value.split(",")
+            elif isinstance(value, list):
+                items = value
+            else:
+                return []
+
+            if len(inner_type) == 0:
+                inner_type = (value_type, value_type)
+
+            container = []
+            for item in items:
+                if inner_type[0] is Any:
+                    container.append(item)
+                    continue
+                try:
+                    container.append(inner_type[0](item))
+                except ValueError:
+                    try:
+                        container.append(inner_type[1](item))
+                    except ValueError:
+                        raise InvalidArgumentException(
+                            f"Invalid value for {inner_type[0]} or {inner_type[1]}",
+                            item,
+                        )
+            return container
+        return []
+
+    def _is_type(self, value: any, value_type: type) -> bool:
+        if value_type is Any:
+            return True
+
         try:
+            if get_origin(value_type) is list:
+                value_type = get_args(value_type)[0]
+                if isinstance(value, str):
+                    items = value.split(",")
+                elif isinstance(value, list):
+                    items = value
+                else:
+                    return False
+
+                for item in items:
+                    return self._is_type(item, value_type)
+
             value_type(value)
             return True
         except ValueError:
@@ -85,7 +134,7 @@ class CLIParser:
 
         self.contains_required(command)
 
-    def get_option(self, name: str, command: str | None = None) -> any:
+    def get_option(self, name: str, command: str | None = None) -> Any:
         """Get the value of an option."""
         command: Command = self.options.get(command, None)
         if command is None:

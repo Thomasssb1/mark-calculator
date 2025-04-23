@@ -12,6 +12,6 @@ class Command:
         """Add an argument to the command."""
         self.args[name.name] = name
 
-    def get_arg(self, name: str):
+    def get_arg(self, name: str) -> Arg | None:
         """Get an argument by name."""
-        return self.args.get(name)
+        return self.args.get(name, None)
