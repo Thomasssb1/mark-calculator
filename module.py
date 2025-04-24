@@ -58,7 +58,7 @@ class Module:
 
     @staticmethod
     def _list_to_csv(items: List[Any] | None, fallback_msg: str = "Not graded") -> str:
-        return f'"{",".join(map(lambda m: str(m), items)) if len(items) > 0 else fallback_msg}"'
+        return f'"{",".join(map(lambda m: str(m) if m is not None else fallback_msg, items)) if len(items) > 0 else fallback_msg}"'
 
     @staticmethod
     def save_to_csv(modules: Set["Module"], filename: str) -> None:
