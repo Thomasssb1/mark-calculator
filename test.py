@@ -14,4 +14,4 @@ class Test:
         return self.grade * self.weight
 
     def __str__(self):
-        return f"{self.name}: {F'{self.grade * self.weight}%' if self.grade is not None else 'Not graded'}"
+        return f"{self.name}: {F'{(self.grade * self.weight):.2f}%' if self.grade is not None else 'Not graded'}"
