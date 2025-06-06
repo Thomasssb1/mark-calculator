@@ -9,21 +9,26 @@ You can easily start the app using docker, like so
 ```bash
 docker run --rm -v mark-calculator:/app/data mark-calculator
 ```
+> I would recommend using an alias so that you do not need to run the entire command each time, to do this add the following to either `~/.bashrc` or `~/.zshrc` depending on your shell.
+> ```bash
+> alias mark-calculator="docker run --rm -v mark-calculator:/app/data mark-calculator"
+> ```
+> All examples documented below use this alias.
 
-If you have python installed, you can also just run
+<br>If you have python installed, you can also just run
 
 ```bash
 python3 main.py
 ```
 
-from within the root directory.
+from within the root directory.<br><br>
 
 First, you will need to add your modules - add all modules, including ungraded ones.
 
 The `--grades` flag and the `--weights` flag are the corresponding test scores as well as the weighting they are to the overall module, so for example, if you have a module with two tests - which are equally weighted - with scores of 65 and 70 you would do the following:
 
 ```bash
-docker run --rm -v mark-calculator:/app/data mark-calculator add --name="My module" --credits=20 --grades=65,70 --weights=0.5,0.5
+mark-calculator add --name="My module" --credits=20 --grades=65,70 --weights=0.5,0.5
 ```
 
 If your module has not received a grade, do not add the `--grades` flag - likewise if you have uncompleted tests do not add them. To consider the remaining uncompleted test scores, make sure to add the accurate weight for the uncompleted grades.
@@ -31,13 +36,13 @@ If your module has not received a grade, do not add the `--grades` flag - likewi
 If you want to remove a module after adding one, run the following
 
 ```bash
-docker run --rm -v mark-calculator:/app/data mark-calculator remove --name="My module"
+mark-calculator remove --name="My module"
 ```
 
 Once all modules have been added, you can run the file with no command prefix, like so
 
 ```bash
-docker run --rm -v mark-calculator:/app/data mark-calculator --target=70
+mark-calculator --target=70
 ```
 
 where `--target` is the overall target grade you wish to achieve for the entire year.
