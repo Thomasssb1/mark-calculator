@@ -30,11 +30,18 @@ if __name__ == "__main__":
         FILENAME = "data/scores.csv"
         modules: Set[Module] = set()
         modules = Module.from_csv(FILENAME)
+
+        calculator = ModuleCalculator(
+            modules,
+            target=0,
+        )
+
         for module in modules:
             print(module)
             if module.tests:
                 print(f"Grades: {', '.join(map(str, module.tests))}")
             print("")
+        print(f"Total grade: {calculator.calculate_overall_grade():2f}%")
     else:
         FILENAME = "data/scores.csv"
         modules: Set[Module] = set()

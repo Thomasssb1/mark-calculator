@@ -30,6 +30,13 @@ class ModuleCalculator:
                     f"Module {module.name} requires an average grade of {module.calculate_required_percentage(grade):.2f}%"
                 )
 
+    def calculate_overall_grade(self) -> float:
+        total_weighted_grade = 0.0
+        for module in self.modules:
+            total_weighted_grade += module.calculate_overall_grade() * module.credits
+
+        return total_weighted_grade / self.total_credits
+
     def __str__(self):
         return (
             f"Modules: {', '.join([str(m) for m in self.modules])}\n"

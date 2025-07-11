@@ -103,7 +103,7 @@ class Module:
         return (grade - contribution) / remaining_weight
 
     def __str__(self):
-        return f"{self.name} ({self.credits} credits) - {f'{self.calculate_overall_grade()}%' if len(self.tests) > 0 else 'Not graded'}"
+        return f"{self.name} ({self.credits} credits) - {f'{self.calculate_overall_grade():.2f}%' if len(self.tests) > 0 else 'Not graded'}"
 
     def __eq__(self, other):
         if not isinstance(other, Module):
