@@ -38,7 +38,7 @@ If you want to remove a module after adding one, run the following
 ```bash
 mark-calculator remove --name="My module"
 ```
-
+<br>
 Once all modules have been added, you can run the file with no command prefix, like so
 
 ```bash
@@ -46,6 +46,11 @@ mark-calculator --target=70
 ```
 
 where `--target` is the overall target grade you wish to achieve for the entire year.
+<br><br>
+If you want to review grades on added modules and also review your overall current grade, you can use the following command
+```bash
+mark-calculator list
+```
 
 For all commands and flags, run `--help`
 
